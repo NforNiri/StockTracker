@@ -111,7 +111,7 @@ export const HEATMAP_WIDGET_CONFIG = {
   hasSymbolTooltip: true,
   isMonoSize: false,
   width: "100%",
-  height: "600",
+  height: 600,
 };
 
 export const TOP_STORIES_WIDGET_CONFIG = {
@@ -122,7 +122,7 @@ export const TOP_STORIES_WIDGET_CONFIG = {
   locale: "en",
   market: "stock",
   width: "100%",
-  height: "600",
+  height: 600,
 };
 
 export const MARKET_DATA_WIDGET_CONFIG = {
@@ -234,7 +234,7 @@ export const BASELINE_WIDGET_CONFIG = (symbol: string) => ({
 export const TECHNICAL_ANALYSIS_WIDGET_CONFIG = (symbol: string) => ({
   symbol: symbol.toUpperCase(),
   colorTheme: "dark",
-  isTransparent: "true",
+  isTransparent: true,
   locale: "en",
   width: "100%",
   height: 400,
@@ -245,7 +245,7 @@ export const TECHNICAL_ANALYSIS_WIDGET_CONFIG = (symbol: string) => ({
 export const COMPANY_PROFILE_WIDGET_CONFIG = (symbol: string) => ({
   symbol: symbol.toUpperCase(),
   colorTheme: "dark",
-  isTransparent: "true",
+  isTransparent: true,
   locale: "en",
   width: "100%",
   height: 440,
@@ -254,7 +254,7 @@ export const COMPANY_PROFILE_WIDGET_CONFIG = (symbol: string) => ({
 export const COMPANY_FINANCIALS_WIDGET_CONFIG = (symbol: string) => ({
   symbol: symbol.toUpperCase(),
   colorTheme: "dark",
-  isTransparent: "true",
+  isTransparent: true,
   locale: "en",
   width: "100%",
   height: 464,

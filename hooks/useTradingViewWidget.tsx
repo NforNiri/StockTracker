@@ -4,33 +4,30 @@ import React, { useEffect, useRef } from "react";
 const useTradingViewWidget = (
   scriptUrl: string,
   config: Record<string, unknown>,
-  height: 600,
+  height: number = 600,
 ) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(
-   
-    () => {
-        if (!containerRef.current) return; // Fix: check if ref is null before using
-        if (containerRef.current.dataset.loaded) return;
-        containerRef.current.innerHTML = `<div class="tradingview-widget-container__widget" style="width: 100%; height: ${height}px;"></div>`;
+  useEffect(() => {
+    if (!containerRef.current) return; // check if ref is null before using
+    if (containerRef.current.dataset.loaded) return;
 
-        const script = document.createElement("script");
-        script.src = scriptUrl;
-      script.async = true;
-      script.innerHTML = JSON.stringify(config);
-     containerRef.current.appendChild(script);
-     containerRef.current.dataset.loaded = "true";
+    containerRef.current.innerHTML = `<div class="tradingview-widget-container__widget" style="width: 100%; height: ${height}px;"></div>`;
 
-     return () => {
-        if(containerRef.current) {
-            containerRef.current.innerHTML = "";
-            delete containerRef.current.dataset.loaded;
-        }
-     }
-    },
-    [scriptUrl, config, height]
-  );
+    const script = document.createElement("script");
+    script.src = scriptUrl;
+    script.async = true;
+    script.innerHTML = JSON.stringify(config);
+    containerRef.current.appendChild(script);
+    containerRef.current.dataset.loaded = "true";
+
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.innerHTML = "";
+        delete containerRef.current.dataset.loaded;
+      }
+    };
+  }, [scriptUrl, JSON.stringify(config), height]);
 
   return containerRef;
 };
