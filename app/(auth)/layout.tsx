@@ -22,7 +22,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             “StockUp is the best way to track your stocks and manage your
             portfolio, it's a great tool for investors.”
           </blockquote>
-          <div className="items-center justify-between">
+          <div className=" items-center justify-between">
             <cite className="auth-testimonial-author"> - Jerry P.</cite>
             <p className="max-md:text-xs text-gray-500">Stock Analyst</p>
           </div>

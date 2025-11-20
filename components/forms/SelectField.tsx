@@ -28,12 +28,12 @@ const SelectField = ({
         control={control}
         rules={{
           required: required
-            ? `Please select ${label.toLowerCase()} an option.`
+            ? `Please select an option for ${label.toLowerCase()}.`
             : false,
         }}
         render={({ field }) => (
           <Select value={field.value} onValueChange={field.onChange}>
-            <SelectTrigger className="select-trigger">
+            <SelectTrigger id={name} className="select-trigger">
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 text-white">
@@ -46,13 +46,13 @@ const SelectField = ({
                   {option.label}
                 </SelectItem>
               ))}
-              {error && (
-                <p className="text-red-500 text-xs mt-1">{error.message}</p>
-              )}
             </SelectContent>
           </Select>
         )}
       />
+      {error && (
+        <p className="text-red-500 text-sm mt-1">{error.message}</p>
+      )}
     </div>
   );
 };

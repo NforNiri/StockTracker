@@ -119,8 +119,8 @@ const SignUp = () => {
         />
         <SelectField
           name="preferredIndustry"
-          label="Prefered Industry"
-          placeholder="Select your prefered industry"
+          label="Preferred Industry"
+          placeholder="Select your preferred industry"
           options={PREFERRED_INDUSTRIES}
           control={control}
           error={errors.preferredIndustry}
@@ -138,7 +138,7 @@ const SignUp = () => {
         </Button>
         <FooterLink
           text="Already have an account?"
-          linktext="Sign In"
+          linkText="Sign In"
           href="/sign-in"
         />
       </form>

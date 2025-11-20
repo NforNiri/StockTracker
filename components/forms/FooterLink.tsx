@@ -2,11 +2,11 @@ import Link from "next/link";
 
 const FooterLink = ({
   text,
-  linktext,
+  linkText,
   href,
 }: {
   text: string;
-  linktext: string;
+  linkText: string;
   href: string;
 }) => {
   return (
@@ -14,7 +14,7 @@ const FooterLink = ({
       <p className="text-gray-500 text-sm">
         {text}{" "}
         <Link href={href} className="footer-link">
-          {linktext}
+          {linkText}
         </Link>
       </p>
     </div>

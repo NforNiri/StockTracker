@@ -7,9 +7,6 @@ declare module 'react-select-country-list' {
   export interface CountryList {
     getData: () => CountryData[];
     getLabel: (value: string) => string;
-    getValue: (label: string) => string;
-    getLabels: () => string[];
-    getValues: () => string[];
     setLabel: (value: string, label: string) => CountryList;
     setEmpty: (label: string) => CountryList;
     native: () => CountryList;
