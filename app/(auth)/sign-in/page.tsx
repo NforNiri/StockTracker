@@ -42,13 +42,15 @@ const SignIn = () => {
       // Assuming successful response implies authentication
       // You might want to store a token here if your API returns one
       // const { token } = await response.json();
-      
+
       router.push("/");
       router.refresh(); // Refresh to ensure auth state is updated in UI
     } catch (e) {
       console.error("Sign-in error:", e);
       setSignInError(
-        e instanceof Error ? e.message : "An unexpected error occurred. Please try again."
+        e instanceof Error
+          ? e.message
+          : "An unexpected error occurred. Please try again."
       );
     }
   };
