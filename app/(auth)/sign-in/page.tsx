@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { signInWithEmail } from "@/lib/actions/auth.actions";
 
 const SignIn = () => {
   const router = useRouter();
@@ -26,22 +27,11 @@ const SignIn = () => {
   const onSubmit = async (data: SignInFormData) => {
     setSignInError(null);
     try {
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const result = await signInWithEmail(data);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Invalid email or password");
+      if (!result.success) {
+        throw new Error(result.message || "Invalid email or password");
       }
-
-      // Assuming successful response implies authentication
-      // You might want to store a token here if your API returns one
-      // const { token } = await response.json();
 
       router.push("/");
       router.refresh(); // Refresh to ensure auth state is updated in UI
