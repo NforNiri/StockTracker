@@ -29,6 +29,26 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Environment Configuration
+
+Create a `.env` file at the project root and configure at least:
+
+```env
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/stockapp
+BETTER_AUTH_SECRET=<at_least_32_characters_random_secret>
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
+```
+
+In production, `NEXT_PUBLIC_BETTER_AUTH_URL` and `BETTER_AUTH_URL` **must** be
+set to your deployed URL (for example `https://stockup.yourdomain.com`).
+
+Email verification behaviour can be controlled with:
+
+```env
+REQUIRE_EMAIL_VERIFICATION=true   # default in production if unset
+```
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

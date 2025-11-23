@@ -8,7 +8,6 @@ export const signOut = async () => {
     await auth.api.signOut({ headers: await headers() });
     return { success: true };
   } catch (error) {
-    console.log("Sign out failed", error);
     return { success: false, message: "Sign out failed" };
   }
 };
@@ -21,7 +20,6 @@ export const signInWithEmail = async ({ email, password }: SignInFormData) => {
     });
     return { success: true, data: response };
   } catch (error) {
-    console.log("Sign in failed", error);
     return { success: false, message: "Sign in failed" };
   }
 };
@@ -35,11 +33,9 @@ export const signUpWithEmail = async ({
   preferredIndustry,
 }: SignUpFormData) => {
   try {
-    console.log("Calling auth.api.signUpEmail...");
     const response = await auth.api.signUpEmail({
       body: { email, password, name: fullName },
     });
-    console.log("auth.api.signUpEmail response:", response);
 
     if (response) {
       await inngest.send({
@@ -56,7 +52,6 @@ export const signUpWithEmail = async ({
     }
     return { success: true, data: response };
   } catch (error) {
-    console.log("Sign up with email failed", error);
     return {
       success: false,
       message: `Signup Error: ${

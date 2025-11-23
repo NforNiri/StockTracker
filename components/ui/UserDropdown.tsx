@@ -12,13 +12,10 @@ import { Button } from "./button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import NavItems from "./NavItems";
 import { LogOut } from "lucide-react";
-
 import { authClient } from "@/lib/auth-client";
 
 const UserDropdown = ({ user }: { user: User }) => {
   const router = useRouter();
-  const { data: session } = authClient.useSession();
-  
 
   const handleLogout = async () => {
     await authClient.signOut({
