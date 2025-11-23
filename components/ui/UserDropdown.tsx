@@ -13,13 +13,25 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import NavItems from "./NavItems";
 import { LogOut } from "lucide-react";
 
-const UserDropdown = () => {
+import { authClient } from "@/lib/auth-client";
+
+const UserDropdown = ({ user }: { user: User }) => {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+  
+
   const handleLogout = async () => {
-    router.push("/sign-in");
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/sign-in");
+        },
+      },
+    });
   };
 
-  const user = { name: "John", email: "john@example.com" };
+  if (!user) return null;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

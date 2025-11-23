@@ -3,7 +3,7 @@ import Image from "next/image";
 import NavItems from "./NavItems";
 import UserDropdown from "./UserDropdown";
 
-const Header = () => {
+const Header = ({ user }: { user: User }) => {
   return (
     <header className="sticky top-0 header">
       <div className="container header-wrapper">
@@ -14,13 +14,14 @@ const Header = () => {
             width={140}
             height={32}
             className="h-8 w-auto cursor-pointer"
+            style={{ width: "auto" }}
           />
         </Link>
         <nav className="hidden sm:block">
-                <NavItems />
+          <NavItems />
         </nav>
-     
-        <UserDropdown />
+
+        <UserDropdown user={user} />
       </div>
     </header>
   );
