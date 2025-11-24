@@ -20,7 +20,7 @@ export const sendWelcomeEmail = async ({
     intro
   );
   const mailOptions = {
-    from: `"StockUp" <noreply@stockup.com>"`,
+    from: `"StockUp" <noreply@stockup.com>`,
     to: email,
     subject: `Welcome to StockUp! - your stock market toolkit is ready`,
     text: `Thank you for signing up for StockUp! We're excited to have you with us.`,
@@ -45,7 +45,7 @@ export const sendDailyNewsSummary = async ({
   ).replace("{{newsContent}}", newsContent);
 
   const mailOptions = {
-    from: `"StockUp" <noreply@stockup.com>"`,
+    from: `"StockUp" <noreply@stockup.com>`,
     to: email,
     subject: `Daily Market Summary - ${emailDate}`,
     text: `Here is your daily market summary for ${emailDate}.`,
