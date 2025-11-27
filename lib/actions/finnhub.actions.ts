@@ -1,6 +1,8 @@
 "use server";
 
+import { cache } from "react";
 import { validateArticle, formatArticle, delay } from "@/lib/utils";
+import { POPULAR_STOCK_SYMBOLS } from "@/lib/constants";
 
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
 const FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
@@ -9,14 +11,21 @@ if (!FINNHUB_API_KEY) {
   throw new Error("NEXT_PUBLIC_FINNHUB_API_KEY is not defined");
 }
 
+// ... imports ...
+
+// Debugging flag
+const DEBUG_SEARCH = true;
+
 async function fetchJSON(url: string, revalidateSeconds?: number) {
   const fetchOptions: RequestInit = revalidateSeconds
     ? { next: { revalidate: revalidateSeconds }, cache: "force-cache" }
     : { cache: "no-store" };
 
+  if (DEBUG_SEARCH) console.log(`[fetchJSON] Requesting: ${url}`);
   const response = await fetch(url, fetchOptions);
 
   if (!response.ok) {
+    if (DEBUG_SEARCH) console.error(`[fetchJSON] Error ${response.status}: ${response.statusText}`);
     throw new Error(
       `Failed to fetch from Finnhub: ${response.status} ${response.statusText}`
     );
@@ -140,3 +149,74 @@ export const getNews = async (
     throw new Error("Failed to fetch news");
   }
 };
+
+export const searchStocks = cache(async (query?: string) => {
+  try {
+    let results: (FinnhubSearchResult & { exchange?: string })[] = [];
+
+    if (!query) {
+      const symbols = POPULAR_STOCK_SYMBOLS.slice(0, 5);
+      const profileResults: (FinnhubSearchResult & { exchange?: string })[] = [];
+      
+      for (const symbol of symbols) {
+        try {
+          const url = `${FINNHUB_BASE_URL}/stock/profile2?symbol=${symbol}&token=${FINNHUB_API_KEY}`;
+          await delay(200); 
+          const profile = await fetchJSON(url, 0); 
+          
+          if (profile && profile.ticker) {
+            profileResults.push({
+              symbol: profile.ticker,
+              description: profile.name,
+              displaySymbol: profile.ticker,
+              type: "Common Stock",
+              exchange: profile.exchange || "US",
+            });
+          } else {
+             if (DEBUG_SEARCH) console.warn(`[searchStocks] Empty profile for ${symbol}`, profile);
+          }
+        } catch (e) {
+          console.error(`Error fetching profile for ${symbol}:`, e);
+        }
+      }
+
+      results = profileResults;
+      
+      // FALLBACK MOCK DATA IF API FAILS completely (for debugging)
+      if (results.length === 0) {
+          console.warn("[searchStocks] No results found from API, using fallback data for debugging.");
+          results = [
+              { symbol: "AAPL", description: "Apple Inc (Fallback)", displaySymbol: "AAPL", type: "Common Stock", exchange: "NASDAQ" },
+              { symbol: "MSFT", description: "Microsoft Corp (Fallback)", displaySymbol: "MSFT", type: "Common Stock", exchange: "NASDAQ" }
+          ];
+      }
+      
+    } else {
+      const trimmedQuery = query.trim();
+      const url = `${FINNHUB_BASE_URL}/search?q=${encodeURIComponent(
+        trimmedQuery
+      )}&token=${FINNHUB_API_KEY}`;
+      const data: FinnhubSearchResponse = await fetchJSON(url, 1800);
+      if (data && data.result) {
+        results = data.result;
+      }
+    }
+
+    const mapped: StockWithWatchlistStatus[] = results
+      .map((item) => {
+        return {
+          symbol: (item.symbol || "").toUpperCase(),
+          name: item.description || "",
+          exchange: item.exchange || item.displaySymbol || "US",
+          type: item.type || "Stock",
+          isInWatchlist: false,
+        };
+      })
+      .slice(0, 15);
+
+    return mapped;
+  } catch (error) {
+    console.error("Error in stock search:", error);
+    return [];
+  }
+});
