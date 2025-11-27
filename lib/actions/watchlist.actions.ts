@@ -3,6 +3,9 @@
 import { connectToDatabase } from "@/database/mongoose";
 import Watchlist from "@/database/models/watchlist.model";
 import mongoose from "mongoose";
+import { auth } from "@/lib/better-auth/auth";
+import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 export const getWatchlistSymbolsByEmail = async (
   email: string
@@ -38,5 +41,60 @@ export const getWatchlistSymbolsByEmail = async (
   } catch (error) {
     console.error("Error fetching watchlist symbols:", error);
     return [];
+  }
+};
+
+export const toggleWatchlist = async (symbol: string, company: string) => {
+  try {
+    await connectToDatabase();
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user) {
+      throw new Error("Unauthorized");
+    }
+
+    const userId = session.user.id;
+    const existingItem = await Watchlist.findOne({ userId, symbol });
+
+    if (existingItem) {
+      await Watchlist.findByIdAndDelete(existingItem._id);
+      revalidatePath("/");
+      revalidatePath(`/stocks/${symbol}`);
+      return { added: false };
+    } else {
+      await Watchlist.create({
+        userId,
+        symbol,
+        company,
+      });
+      revalidatePath("/");
+      revalidatePath(`/stocks/${symbol}`);
+      return { added: true };
+    }
+  } catch (error) {
+    console.error("Error toggling watchlist:", error);
+    throw error;
+  }
+};
+
+export const isStockInWatchlist = async (symbol: string) => {
+  try {
+    await connectToDatabase();
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user) {
+      return false;
+    }
+
+    const userId = session.user.id;
+    const item = await Watchlist.findOne({ userId, symbol });
+    return !!item;
+  } catch (error) {
+    console.error("Error checking watchlist status:", error);
+    return false;
   }
 };
