@@ -63,7 +63,7 @@ export function SearchCommand({
     setOpen(false);
     setSearchTerm("");
     setStocks(initialStocks);
-    router.push(`/stock/${value}`);
+    router.push(`/stocks/${value}`);
   };
 
   return (
@@ -115,7 +115,7 @@ export function SearchCommand({
                   onSelect={() => handleSelectStock(stock.symbol)}
                 >
                   <Link
-                    href={`/stock/${stock.symbol}`}
+                    href={`/stocks/${stock.symbol}`}
                     className="search-item-link"
                     onClick={(e) => {
                       // Prevent duplicate navigation since CommandItem onSelect handles it via handleSelectStock -> router.push
