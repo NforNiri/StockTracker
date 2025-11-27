@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import NavItems from "./NavItems";
 import { LogOut } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import type { StockWithWatchlistStatus, User } from "@/types/global";
 
 const UserDropdown = ({ initialStocks, user }: { initialStocks: StockWithWatchlistStatus[], user: User }) => {
   const router = useRouter();

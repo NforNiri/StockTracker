@@ -5,16 +5,16 @@ import { validateArticle, formatArticle, delay } from "@/lib/utils";
 import { POPULAR_STOCK_SYMBOLS } from "@/lib/constants";
 
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
-const FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
 
 if (!FINNHUB_API_KEY) {
-  throw new Error("NEXT_PUBLIC_FINNHUB_API_KEY is not defined");
+  throw new Error("FINNHUB_API_KEY is not defined");
 }
 
 // ... imports ...
 
 // Debugging flag
-const DEBUG_SEARCH = true;
+const DEBUG_SEARCH = process.env.DEBUG_SEARCH === 'true';
 
 async function fetchJSON(url: string, revalidateSeconds?: number) {
   const fetchOptions: RequestInit = revalidateSeconds

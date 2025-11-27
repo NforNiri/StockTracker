@@ -57,7 +57,7 @@ export function SearchCommand({
 
   useEffect(() => {
     debouncedSearch();
-  }, [searchTerm]);
+  }, [searchTerm, debouncedSearch]);
 
   const handleSelectStock = (value: string) => {
     setOpen(false);
@@ -117,6 +117,10 @@ export function SearchCommand({
                   <Link
                     href={`/stock/${stock.symbol}`}
                     className="search-item-link"
+                    onClick={(e) => {
+                      // Prevent duplicate navigation since CommandItem onSelect handles it via handleSelectStock -> router.push
+                      e.preventDefault();
+                    }}
                   >
                     <TrendingUp className="h-4 w-4 text-gray-500" />
                     <div className="flex-1">
