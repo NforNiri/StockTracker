@@ -19,8 +19,11 @@ export const signInWithEmail = async ({ email, password }: SignInFormData) => {
       body: { email, password },
     });
     return { success: true, data: response };
-  } catch (error) {
-    return { success: false, message: "Sign in failed" };
+  } catch (error: any) {
+    console.error("Sign-in error in server action:", error);
+    // Try to extract a meaningful message from the error object if possible
+    const message = error?.body?.message || error?.message || "Sign in failed";
+    return { success: false, message };
   }
 };
 export const signUpWithEmail = async ({
