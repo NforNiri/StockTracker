@@ -3,6 +3,7 @@ import Image from "next/image";
 import NavItems from "./NavItems";
 import UserDropdown from "./UserDropdown";
 import { searchStocks } from "@/lib/actions/finnhub.actions";
+import { User } from "@/types/global";
 
 const Header = async ({ user }: { user: User }) => {
 
