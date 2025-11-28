@@ -8,6 +8,7 @@ const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
 // Global declaration for TypeScript to recognize the cache
 declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined;
+  var _mongoClient: MongoClient | undefined;
 }
 
 let client: MongoClient;
@@ -22,24 +23,31 @@ if (!MONGODB_URI) {
 }
 
 const uri = MONGODB_URI || "mongodb://localhost:27017/stockapp_fallback";
+const options = {
+    // Optional: Add timeouts or pool size options if needed for serverless
+    // serverSelectionTimeoutMS: 10000,
+    // socketTimeoutMS: 45000,
+};
 
 if (process.env.NODE_ENV === "development") {
   // In development mode, use a global variable so that the value
   // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri);
-    global._mongoClientPromise = client.connect();
-  } else {
-     // Re-instantiate client to satisfy TypeScript and allow .db() access
-     // Ideally we should cache the client instance too, but the promise is what matters for connection reuse.
-     client = new MongoClient(uri);
+  if (!global._mongoClient) {
+    global._mongoClient = new MongoClient(uri, options);
+    global._mongoClientPromise = global._mongoClient.connect();
   }
-  clientPromise = global._mongoClientPromise;
+  client = global._mongoClient;
+  clientPromise = global._mongoClientPromise!;
 } else {
   // In production mode, it's best to not use a global variable.
-  client = new MongoClient(uri);
+  client = new MongoClient(uri, options);
   clientPromise = client.connect();
 }
+
+// Add error handler to connection promise
+clientPromise.catch(err => {
+    console.error("MongoDB Connection Error in auth.ts:", err);
+});
 
 // better-auth mongodbAdapter expects a Db instance.
 // We can pass the db from the client.
@@ -51,9 +59,9 @@ const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET || "fallback_secret_fo
 
 
 const REQUIRE_EMAIL_VERIFICATION =
-  process.env.REQUIRE_EMAIL_VERIFICATION !== undefined
-    ? process.env.REQUIRE_EMAIL_VERIFICATION === "true"
-    : process.env.NODE_ENV === "production";
+  process.env.REQUIRE_EMAIL_VERIFICATION === "true"; 
+  // Defaults to false to avoid blocking sign-ins if email provider isn't set up.
+  // Was: process.env.NODE_ENV === "production";
 
 export const auth = betterAuth({
   database: mongodbAdapter(db),
