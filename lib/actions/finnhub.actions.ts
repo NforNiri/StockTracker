@@ -3,6 +3,7 @@
 import { cache } from "react";
 import { validateArticle, formatArticle, delay } from "@/lib/utils";
 import { POPULAR_STOCK_SYMBOLS } from "@/lib/constants";
+import { StockWithWatchlistStatus } from "@/types/global";
 
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
 const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
