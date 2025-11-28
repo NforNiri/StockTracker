@@ -3,11 +3,6 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient } from "mongodb";
 import { nextCookies } from "better-auth/next-js";
 
-import { betterAuth } from "better-auth";
-import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { MongoClient } from "mongodb";
-import { nextCookies } from "better-auth/next-js";
-
 const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
 
 // Global declaration for TypeScript to recognize the cache
