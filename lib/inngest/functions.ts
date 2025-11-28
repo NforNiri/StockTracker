@@ -77,7 +77,7 @@ export const sendDailyNewsSummaryFunction = inngest.createFunction(
   async ({ step }) => {
     // step 1 : Get all users for mail delivery
     const users = await step.run("get-all-users", async () => {
-      return await getAllUsersForNewsEmail();
+      return (await getAllUsersForNewsEmail()) || [];
     });
 
     if (!users || users.length === 0) {
@@ -93,7 +93,10 @@ export const sendDailyNewsSummaryFunction = inngest.createFunction(
         user: UserForNewsEmail;
         articles: MarketNewsArticle[];
       }> = [];
-      for (const user of users as UserForNewsEmail[]) {
+      
+      const userList = users as unknown as UserForNewsEmail[];
+      
+      for (const user of userList) {
         try {
           const symbols = await getWatchlistSymbolsByEmail(user.email);
           let articles = await getNews(symbols);
