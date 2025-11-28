@@ -8,8 +8,10 @@ import { StockWithWatchlistStatus } from "@/types/global";
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
 const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
 
-if (!FINNHUB_API_KEY) {
-  throw new Error("FINNHUB_API_KEY is not defined");
+// Only throw in runtime, non-build environments if the key is missing.
+// During build (static generation), we might not have the key, but we shouldn't fail.
+if (!FINNHUB_API_KEY && process.env.NODE_ENV === "production" && typeof window === "undefined") {
+  // console.warn("FINNHUB_API_KEY is not defined"); // Optional warning
 }
 
 // ... imports ...
@@ -61,6 +63,7 @@ export const getNews = async (
       // Better approach: Fetch news for ALL symbols (parallel), then round-robin pick from the results.
 
       const symbolNewsPromises = cleanSymbols.map(async (symbol) => {
+        if (!FINNHUB_API_KEY) return { symbol, articles: [] }; // Handle missing key during build
         const url = `${FINNHUB_BASE_URL}/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`;
         try {
           const data = await fetchJSON(url, 3600); // Cache for 1 hour
@@ -119,27 +122,29 @@ export const getNews = async (
 
     // Fallback to general news if no symbols or no company news found
     if (newsArticles.length === 0) {
-      const url = `${FINNHUB_BASE_URL}/news?category=general&token=${FINNHUB_API_KEY}`;
-      const data = await fetchJSON(url, 3600); // Cache for 1 hour
+      if (FINNHUB_API_KEY) {
+        const url = `${FINNHUB_BASE_URL}/news?category=general&token=${FINNHUB_API_KEY}`;
+        const data = await fetchJSON(url, 3600); // Cache for 1 hour
 
-      if (Array.isArray(data)) {
-        const uniqueArticles = new Map<string, RawNewsArticle>();
+        if (Array.isArray(data)) {
+          const uniqueArticles = new Map<string, RawNewsArticle>();
 
-        for (const item of data) {
-          if (!validateArticle(item)) continue;
-          // Deduplicate by URL (or headline if URL missing, but validateArticle checks URL)
-          if (!uniqueArticles.has(item.url!)) {
-            uniqueArticles.set(item.url!, item);
+          for (const item of data) {
+            if (!validateArticle(item)) continue;
+            // Deduplicate by URL (or headline if URL missing, but validateArticle checks URL)
+            if (!uniqueArticles.has(item.url!)) {
+              uniqueArticles.set(item.url!, item);
+            }
           }
+
+          const sortedGeneral = Array.from(uniqueArticles.values())
+            .sort((a, b) => (b.datetime || 0) - (a.datetime || 0))
+            .slice(0, 6); // Take top 6
+
+          sortedGeneral.forEach((article, index) => {
+            newsArticles.push(formatArticle(article, false, undefined, index));
+          });
         }
-
-        const sortedGeneral = Array.from(uniqueArticles.values())
-          .sort((a, b) => (b.datetime || 0) - (a.datetime || 0))
-          .slice(0, 6); // Take top 6
-
-        sortedGeneral.forEach((article, index) => {
-          newsArticles.push(formatArticle(article, false, undefined, index));
-        });
       }
     }
 
@@ -161,6 +166,10 @@ export const searchStocks = cache(async (query?: string) => {
       
       for (const symbol of symbols) {
         try {
+          if (!FINNHUB_API_KEY) {
+             if (DEBUG_SEARCH) console.warn(`[searchStocks] Missing API KEY, skipping ${symbol}`);
+             continue;
+          }
           const url = `${FINNHUB_BASE_URL}/stock/profile2?symbol=${symbol}&token=${FINNHUB_API_KEY}`;
           await delay(200); 
           const profile = await fetchJSON(url, 0); 
@@ -194,12 +203,14 @@ export const searchStocks = cache(async (query?: string) => {
       
     } else {
       const trimmedQuery = query.trim();
-      const url = `${FINNHUB_BASE_URL}/search?q=${encodeURIComponent(
-        trimmedQuery
-      )}&token=${FINNHUB_API_KEY}`;
-      const data: FinnhubSearchResponse = await fetchJSON(url, 1800);
-      if (data && data.result) {
-        results = data.result;
+      if (FINNHUB_API_KEY) {
+        const url = `${FINNHUB_BASE_URL}/search?q=${encodeURIComponent(
+          trimmedQuery
+        )}&token=${FINNHUB_API_KEY}`;
+        const data: FinnhubSearchResponse = await fetchJSON(url, 1800);
+        if (data && data.result) {
+          results = data.result;
+        }
       }
     }
 
