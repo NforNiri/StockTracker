@@ -1,5 +1,23 @@
 import { UseFormRegister, Control, FieldError, RegisterOptions } from "react-hook-form";
 
+// Export types explicitly so they can be imported as modules
+export type User = {
+    id: string;
+    name: string;
+    email: string;
+};
+
+export type Stock = {
+    symbol: string;
+    name: string;
+    exchange: string;
+    type: string;
+};
+
+export type StockWithWatchlistStatus = Stock & {
+    isInWatchlist: boolean;
+};
+
 declare global {
     type SignInFormData = {
         email: string;
@@ -67,23 +85,6 @@ declare global {
         email: string;
         name: string;
         intro: string;
-    };
-
-    type User = {
-        id: string;
-        name: string;
-        email: string;
-    };
-
-    type Stock = {
-        symbol: string;
-        name: string;
-        exchange: string;
-        type: string;
-    };
-
-    type StockWithWatchlistStatus = Stock & {
-        isInWatchlist: boolean;
     };
 
     type FinnhubSearchResult = {
