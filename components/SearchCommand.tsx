@@ -15,6 +15,7 @@ import { searchStocks } from "@/lib/actions/finnhub.actions";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { StockWithWatchlistStatus } from "@/types/global";
 
 export function SearchCommand({
   renderAs = "button",
