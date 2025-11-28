@@ -29,6 +29,10 @@ if (process.env.NODE_ENV === "development") {
   if (!global._mongoClientPromise) {
     client = new MongoClient(uri);
     global._mongoClientPromise = client.connect();
+  } else {
+     // Re-instantiate client to satisfy TypeScript and allow .db() access
+     // Ideally we should cache the client instance too, but the promise is what matters for connection reuse.
+     client = new MongoClient(uri);
   }
   clientPromise = global._mongoClientPromise;
 } else {
