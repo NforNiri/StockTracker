@@ -10,7 +10,7 @@ const Header = async ({ user }: { user: User }) => {
   const initialStocks = await searchStocks();
   
   // Debug log for checking data flow
-  console.log("Header received initialStocks:", initialStocks?.length || 0);
+  // console.log("Header received initialStocks:", initialStocks?.length || 0);
 
   return (
     <header className="sticky top-0 header">
@@ -22,7 +22,8 @@ const Header = async ({ user }: { user: User }) => {
             width={140}
             height={32}
             className="h-8 w-auto cursor-pointer"
-            style={{ width: "auto" }}
+            style={{ width: "auto", height: "auto" }}
+            priority
           />
         </Link>
         <nav className="hidden sm:block">
