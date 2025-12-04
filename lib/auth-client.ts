@@ -1,7 +1,7 @@
 import { createAuthClient } from "better-auth/react";
 
 const isProd = process.env.NODE_ENV === "production";
-const baseURLEnv = process.env.BETTER_AUTH_URL;
+const baseURLEnv = process.env.NEXT_PUBLIC_BETTER_AUTH_URL;
 
 // In production, warn instead of crashing, or try to infer from window location if available
 if (isProd && !baseURLEnv) {
