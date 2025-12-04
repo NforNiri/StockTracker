@@ -31,7 +31,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
         <div className="z-10 relative lg:mt-4 lg:mb-16">
           <blockquote className="auth-blockquote">
             “StockUp is the best way to track your stocks and manage your
-            portfolio, it's a great tool for investors.”
+            portfolio, it&apos;s a great tool for investors.”
           </blockquote>
           <div className=" items-center justify-between">
             <cite className="auth-testimonial-author"> - Jerry P.</cite>

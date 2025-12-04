@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Star, Trash2 } from "lucide-react";
+import { Star } from "lucide-react";
 import { toggleWatchlist } from "@/lib/actions/watchlist.actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -33,7 +33,7 @@ export default function WatchlistButton({
           ? `${symbol} added to watchlist`
           : `${symbol} removed from watchlist`
       );
-    } catch (error) {
+    } catch {
       toast.error("Failed to update watchlist");
     } finally {
       setIsLoading(false);

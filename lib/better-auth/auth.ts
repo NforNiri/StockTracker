@@ -12,7 +12,6 @@ declare global {
 }
 
 let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
 
 // Debug logging
 if (process.env.NODE_ENV === "production") {
@@ -59,6 +58,7 @@ if (!global._mongoClientPromise) {
 try {
    if (global._mongoClient) {
        // Check standard 'topology' property
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
        const clientAny = global._mongoClient as any;
        const topology = clientAny.topology;
        
@@ -77,7 +77,7 @@ try {
        if (!isConnected) {
             console.warn("⚠️ MongoDB client found disconnected. Force recreating...");
             // Force close old one just in case
-            try { await global._mongoClient.close(); } catch(e) {}
+            try { await global._mongoClient.close(); } catch {}
             
             global._mongoClient = new MongoClient(uri, options);
             global._mongoClientPromise = global._mongoClient.connect();
@@ -88,7 +88,7 @@ try {
 }
 
 client = global._mongoClient!;
-clientPromise = global._mongoClientPromise!;
+const clientPromise = global._mongoClientPromise!;
 
 // Add error handler to connection promise
 clientPromise.catch(err => {

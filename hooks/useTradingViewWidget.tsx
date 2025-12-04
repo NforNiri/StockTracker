@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 
 const useTradingViewWidget = (
   scriptUrl: string,
@@ -7,27 +7,33 @@ const useTradingViewWidget = (
   height: number = 600,
 ) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  
+  // Stabilize config to avoid complex dependency warning
+  const configStr = useMemo(() => JSON.stringify(config), [config]);
 
   useEffect(() => {
-    if (!containerRef.current) return; // check if ref is null before using
-    if (containerRef.current.dataset.loaded) return;
+    // Capture ref value to variable for cleanup
+    const container = containerRef.current;
+    
+    if (!container) return; // check if ref is null before using
+    if (container.dataset.loaded) return;
 
-    containerRef.current.innerHTML = `<div class="tradingview-widget-container__widget" style="width: 100%; height: ${height}px;"></div>`;
+    container.innerHTML = `<div class="tradingview-widget-container__widget" style="width: 100%; height: ${height}px;"></div>`;
 
     const script = document.createElement("script");
     script.src = scriptUrl;
     script.async = true;
-    script.innerHTML = JSON.stringify(config);
-    containerRef.current.appendChild(script);
-    containerRef.current.dataset.loaded = "true";
+    script.innerHTML = configStr;
+    container.appendChild(script);
+    container.dataset.loaded = "true";
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = "";
-        delete containerRef.current.dataset.loaded;
+      if (container) {
+        container.innerHTML = "";
+        delete container.dataset.loaded;
       }
     };
-  }, [scriptUrl, JSON.stringify(config), height]);
+  }, [scriptUrl, configStr, height]);
 
   return containerRef;
 };

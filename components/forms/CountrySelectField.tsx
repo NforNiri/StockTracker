@@ -21,6 +21,7 @@ import { Label } from '@/components/ui/label';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import countryList from 'react-select-country-list';
+import Image from 'next/image';
 
 type CountrySelectProps = {
     name: string;
@@ -53,12 +54,12 @@ const CountrySelect = ({
                 >
                     {value ? (
                         <span className='flex items-center gap-2'>
-              <img
+              <Image
                   src={`https://flagcdn.com/w20/${value.toLowerCase()}.png`}
-                  srcSet={`https://flagcdn.com/w40/${value.toLowerCase()}.png 2x`}
-                  width="20"
-                  height="15"
+                  width={20}
+                  height={15}
                   alt={value}
+                  style={{ width: 'auto', height: 'auto' }}
               />
               <span>{countries.find((c) => c.value === value)?.label}</span>
             </span>
@@ -99,12 +100,12 @@ const CountrySelect = ({
                                         )}
                                     />
                                     <span className='flex items-center gap-2'>
-                    <img
+                    <Image
                         src={`https://flagcdn.com/w20/${country.value.toLowerCase()}.png`}
-                        srcSet={`https://flagcdn.com/w40/${country.value.toLowerCase()}.png 2x`}
-                        width="20"
-                        height="15"
+                        width={20}
+                        height={15}
                         alt={country.label}
+                        style={{ width: 'auto', height: 'auto' }}
                     />
                     <span>{country.label}</span>
                   </span>

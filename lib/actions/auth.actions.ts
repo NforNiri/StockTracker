@@ -7,7 +7,7 @@ export const signOut = async () => {
   try {
     await auth.api.signOut({ headers: await headers() });
     return { success: true };
-  } catch (error) {
+  } catch {
     return { success: false, message: "Sign out failed" };
   }
 };
@@ -19,10 +19,11 @@ export const signInWithEmail = async ({ email, password }: SignInFormData) => {
       body: { email, password },
     });
     return { success: true, data: response };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Sign-in error in server action:", error);
     // Try to extract a meaningful message from the error object if possible
-    const message = error?.body?.message || error?.message || "Sign in failed";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const message = (error as any)?.body?.message || (error as Error)?.message || "Sign in failed";
     return { success: false, message };
   }
 };

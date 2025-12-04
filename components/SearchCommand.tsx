@@ -3,7 +3,6 @@
 import {
   CommandDialog,
   CommandEmpty,
-  CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
@@ -108,7 +107,7 @@ export function SearchCommand({
                 {isSearchMode ? "Search results" : "Top stocks"} (
                 {displayStocks?.length || 0})
               </div>
-              {displayStocks?.map((stock, i) => (
+              {displayStocks?.map((stock) => (
                 <CommandItem 
                   key={stock.symbol} 
                   value={stock.symbol}

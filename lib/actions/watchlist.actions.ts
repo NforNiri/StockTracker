@@ -2,7 +2,6 @@
 
 import { connectToDatabase } from "@/database/mongoose";
 import Watchlist from "@/database/models/watchlist.model";
-import mongoose from "mongoose";
 import { auth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";

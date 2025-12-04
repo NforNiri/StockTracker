@@ -53,7 +53,6 @@ export const getNews = async (
     if (symbols && symbols.length > 0) {
       const cleanSymbols = symbols.map((s) => s.trim().toUpperCase());
       const maxArticles = 6;
-      let articlesFound = 0;
       let rounds = 0;
       const maxRounds = 6; // Safety break to prevent infinite loops if no news found
 
@@ -81,10 +80,11 @@ export const getNews = async (
       const newsMap = new Map<string, RawNewsArticle[]>();
 
       allNewsResults.forEach(({ symbol, articles }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const validArticles = articles.filter((a: any) => validateArticle(a));
         // Sort descending by datetime
         validArticles.sort(
-          (a: any, b: any) => (b.datetime || 0) - (a.datetime || 0)
+          (a: { datetime?: number }, b: { datetime?: number }) => (b.datetime || 0) - (a.datetime || 0)
         );
         newsMap.set(symbol, validArticles);
       });

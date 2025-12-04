@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { UseFormRegister, Control, FieldError, RegisterOptions } from "react-hook-form";
 
 // Export types explicitly so they can be imported as modules
