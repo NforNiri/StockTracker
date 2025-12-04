@@ -14,11 +14,24 @@ declare global {
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
+// Debug logging
+if (process.env.NODE_ENV === "production") {
+    if (!MONGODB_URI) {
+        console.error("⚠️ CRITICAL: MONGODB_URI is not defined in production environment variables!");
+    } else {
+        const maskedUri = MONGODB_URI.replace(/:([^:@]+)@/, ":****@");
+        console.log(`✅ Authentication initializing with URI: ${maskedUri}`);
+        if (MONGODB_URI.includes("localhost") || MONGODB_URI.includes("127.0.0.1")) {
+             console.warn("⚠️ WARNING: MONGODB_URI points to localhost in production. This will likely fail.");
+        }
+    }
+}
+
 if (!MONGODB_URI) {
   // Allow build to pass even if MONGODB_URI is missing (using fallback), 
   // but ensure it fails or warns at runtime if needed.
   if (process.env.NODE_ENV === "production" && typeof window === "undefined") {
-    console.warn("MONGODB_URI is missing in production build. Authentication will fail if not set at runtime.");
+     // We don't throw here to avoid breaking static generation, but we log heavily above.
   }
 }
 
@@ -27,14 +40,25 @@ const options = {
     // In serverless environments, it's important to limit the pool size
     // to prevent exhausting database connection limits.
     maxPoolSize: 10,
-    serverSelectionTimeoutMS: 5000, // Timeout faster if DB is unreachable
+    serverSelectionTimeoutMS: 10000, // Wait up to 10s for connection
+    socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    connectTimeoutMS: 10000,
 };
 
+// Singleton pattern for both dev and prod to handle hot reload and serverless container reuse
 if (!global._mongoClientPromise) {
     client = new MongoClient(uri, options);
     global._mongoClient = client;
     global._mongoClientPromise = client.connect();
 }
+
+// Check if client is closed and reconnect if needed (experimental)
+if (global._mongoClient && global._mongoClient.topology && (global._mongoClient.topology as any).isDestroyed?.()) {
+    console.warn("⚠️ MongoDB client topology was destroyed. Recreating client...");
+    global._mongoClient = new MongoClient(uri, options);
+    global._mongoClientPromise = global._mongoClient.connect();
+}
+
 client = global._mongoClient!;
 clientPromise = global._mongoClientPromise!;
 
@@ -65,7 +89,7 @@ export const auth = betterAuth({
   secret: BETTER_AUTH_SECRET,
   baseUrl: process.env.BETTER_AUTH_URL,
   logger: {
-    level: "debug",
+    level: "debug", // Keep debug logging enabled for now
   },
   advanced: {
     defaultCookieAttributes: {
