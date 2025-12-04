@@ -41,6 +41,9 @@ clientPromise = global._mongoClientPromise!;
 // Add error handler to connection promise
 clientPromise.catch(err => {
     console.error("MongoDB Connection Error in auth.ts:", err);
+    // Reset the client promise so we can try again on next request
+    global._mongoClientPromise = undefined;
+    global._mongoClient = undefined;
 });
 
 // better-auth mongodbAdapter expects a Db instance.
