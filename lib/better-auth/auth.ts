@@ -36,31 +36,55 @@ if (!MONGODB_URI) {
 }
 
 const uri = MONGODB_URI || "mongodb://localhost:27017/stockapp_fallback";
+// NOTE: For serverless, we must disable buffering and tune the connection.
 const options = {
-    // In serverless environments, it's important to limit the pool size
-    // to prevent exhausting database connection limits.
-    maxPoolSize: 10,
-    serverSelectionTimeoutMS: 10000, // Wait up to 10s for connection
-    socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    maxPoolSize: 1, // Start with 1 to minimize connection overhead
+    minPoolSize: 0,
+    serverSelectionTimeoutMS: 5000, 
+    socketTimeoutMS: 10000,
     connectTimeoutMS: 10000,
+    // Provide a fresh connection more often in lambda
+    maxIdleTimeMS: 10000, 
 };
 
-// Singleton pattern for both dev and prod to handle hot reload and serverless container reuse
+// Singleton pattern for both dev and prod
 if (!global._mongoClientPromise) {
     client = new MongoClient(uri, options);
     global._mongoClient = client;
     global._mongoClientPromise = client.connect();
 }
 
-// Check if client is closed and reconnect if needed (experimental)
-// Note: In mongodb v4, we check client.topology.isConnected()
-if (global._mongoClient) {
-   const topology = (global._mongoClient as any).topology;
-   if (topology && topology.isConnected && !topology.isConnected()) {
-        console.warn("⚠️ MongoDB client topology is not connected. Recreating client...");
-        global._mongoClient = new MongoClient(uri, options);
-        global._mongoClientPromise = global._mongoClient.connect();
+// FORCE RECONNECT if topology is closed/destroyed
+// Using try-catch to access internal properties safely
+try {
+   if (global._mongoClient) {
+       // Check standard 'topology' property
+       const clientAny = global._mongoClient as any;
+       const topology = clientAny.topology;
+       
+       let isConnected = false;
+       if (topology) {
+           // V4 driver check
+           if (typeof topology.isConnected === 'function') {
+               isConnected = topology.isConnected();
+           } 
+           // Fallback check (some versions use s.state)
+           else if (topology.s && topology.s.state) {
+               isConnected = topology.s.state === 'connected';
+           }
+       }
+
+       if (!isConnected) {
+            console.warn("⚠️ MongoDB client found disconnected. Force recreating...");
+            // Force close old one just in case
+            try { await global._mongoClient.close(); } catch(e) {}
+            
+            global._mongoClient = new MongoClient(uri, options);
+            global._mongoClientPromise = global._mongoClient.connect();
+       }
    }
+} catch (e) {
+    console.error("Error checking mongo status:", e);
 }
 
 client = global._mongoClient!;
