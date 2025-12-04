@@ -53,10 +53,14 @@ if (!global._mongoClientPromise) {
 }
 
 // Check if client is closed and reconnect if needed (experimental)
-if (global._mongoClient && (global._mongoClient as any).topology && ((global._mongoClient as any).topology as any).isDestroyed?.()) {
-    console.warn("⚠️ MongoDB client topology was destroyed. Recreating client...");
-    global._mongoClient = new MongoClient(uri, options);
-    global._mongoClientPromise = global._mongoClient.connect();
+// Note: In mongodb v4, we check client.topology.isConnected()
+if (global._mongoClient) {
+   const topology = (global._mongoClient as any).topology;
+   if (topology && topology.isConnected && !topology.isConnected()) {
+        console.warn("⚠️ MongoDB client topology is not connected. Recreating client...");
+        global._mongoClient = new MongoClient(uri, options);
+        global._mongoClientPromise = global._mongoClient.connect();
+   }
 }
 
 client = global._mongoClient!;
