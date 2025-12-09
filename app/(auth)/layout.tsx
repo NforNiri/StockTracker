@@ -17,12 +17,13 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
       <section className="auth-left-section scrollbar-hide-default">
         <Link href="/" className="auth-logo">
           <Image
-            src="/assets/icons/logo.svg"
+            src="/assets/icons/logo-transparent.png"
             alt="StockUp"
-            width={140}
-            height={32}
-            className="h-8 w-auto"
+            width={160}
+            height={40}
+            className="h-14 w-auto"
             style={{ width: "auto" }}
+            priority
           />
         </Link>
         <div className="pb-6 lg:pb-8 flex-1">{children}</div>

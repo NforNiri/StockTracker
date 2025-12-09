@@ -17,12 +17,12 @@ const Header = async ({ user }: { user: User }) => {
       <div className="container header-wrapper">
         <Link href="/">
           <Image
-            src="/assets/icons/logo.svg"
+            src="/assets/icons/logo-transparent.png"
             alt="StockUp"
-            width={140}
-            height={32}
-            className="h-8 w-auto cursor-pointer"
-            style={{ width: "auto", height: "auto" }}
+            width={160}
+            height={40}
+            className="h-14 w-auto cursor-pointer"
+            style={{ width: "auto" }}
             priority
           />
         </Link>
